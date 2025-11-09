@@ -1,34 +1,53 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-  // app.js
-  // Get input values
-  let principal = parseFloat(document.getElementById("principal").value);
-  let rate = parseFloat(document.getElementById("rate").value);
-  let tenure = parseFloat(document.getElementById("tenure").value);
+  const [principal, setPrincipal] = useState(100000);
+  const [interestRate, setInterestRate] = useState(7); // Annual interest rate
+  const [tenure, setTenure] = useState(12); // Tenure in months
+  const [emi, setEmi] = useState(0);
 
-  // Convert annual rate to monthly and tenure to months
-  let monthlyRate = rate / 12 / 100;
-  let months = tenure * 12;
+  useEffect(() => {
+    calculateEmi();
+  }, [principal, interestRate, tenure]);
 
-  // EMI Formula
-  let emi =
-    (principal * monthlyRate * Math.pow(1 + monthlyRate, months)) /
-    (Math.pow(1 + monthlyRate, months) - 1);
+  const calculateEmi = () => {
+    const monthlyInterestRate = interestRate / 12 / 100;
+    const powerFactor = Math.pow(1 + monthlyInterestRate, tenure);
+    const calculatedEmi = (principal * monthlyInterestRate * powerFactor) / (powerFactor - 1);
+    setEmi(calculatedEmi.toFixed(2)); // Format to 2 decimal places
+  };
 
-  // Total amount & interest
-  let totalPayment = emi * months;
-  let totalInterest = totalPayment - principal;
-
-  // Display results
-  document.getElementById("result").innerHTML = `
-    <h3>EMI Details:</h3>
-    <p>Monthly EMI: ₹${emi.toFixed(2)}</p>
-    <p>Total Interest: ₹${totalInterest.toFixed(2)}</p>
-    <p>Total Payment: ₹${totalPayment.toFixed(2)}</p>
-  `;
+  return (
+    <div className="App">
+      <h1>EMI Calculator</h1>
+      <div>
+        <label>Principal Amount:</label>
+        <input
+          type="number"
+          value={principal}
+          onChange={(e) => setPrincipal(parseFloat(e.target.value))}
+        />
+      </div>
+      <div>
+        <label>Annual Interest Rate (%):</label>
+        <input
+          type="number"
+          value={interestRate}
+          onChange={(e) => setInterestRate(parseFloat(e.target.value))}
+        />
+      </div>
+      <div>
+        <label>Loan Tenure (Months):</label>
+        <input
+          type="number"
+          value={tenure}
+          onChange={(e) => setTenure(parseFloat(e.target.value))}
+        />
+      </div>
+      <h2>Monthly EMI: ₹{emi}</h2>
+    </div>
+  );
 }
-
 
 export default App;
